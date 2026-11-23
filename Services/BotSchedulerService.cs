@@ -1,4 +1,4 @@
-using BotCripto.Models;
+﻿using BotCripto.Models;
 using BotCripto.Strategies;
 
 namespace BotCripto.Services;
@@ -12,7 +12,7 @@ public class BotSchedulerService
     private readonly YahooDataService _dataService;
     private readonly NotificationService _notificationService;
     private readonly ReportingService _reportingService;
-    private readonly EmaRibbonTrendFollowingStrategy _emaRibbonStrategy;
+    private readonly Sma200Strategy _emaRibbonStrategy;
     private readonly RiskManager _riskManager;
     private Timer? _marketCheckTimer;
     private Timer? _weeklyReportTimer;
@@ -39,7 +39,7 @@ public class BotSchedulerService
         _dataService = new YahooDataService();
         _notificationService = new NotificationService();
         _reportingService = new ReportingService();
-        _emaRibbonStrategy = new EmaRibbonTrendFollowingStrategy();
+        _emaRibbonStrategy = new Sma200Strategy();
         _riskManager = new RiskManager(
             positionValue: capitalPerTrade,   // importo fisso per trade ($)
             rewardRiskRatio: rewardRiskRatio, // take profit = R:R × distanza dello stop
@@ -170,7 +170,7 @@ public class BotSchedulerService
             else
             {
                 // Regime di mercato (SPY sopra/sotto la EMA50) sulla seduta appena chiusa: filtro direzionale della strategia
-                var marketBullish = EmaRibbonTrendFollowingStrategy.IsMarketBullish(marketClosed);
+                var marketBullish = Sma200Strategy.IsMarketBullish(marketClosed);
                 Console.WriteLine($"🕯️  Seduta del {lastClosedTime:yyyy-MM-dd} chiusa: ricerca segnali");
                 Console.WriteLine($"📊 Regime di mercato ({YahooDataService.MarketSymbol}): {(marketBullish == null ? "sconosciuto (nessun segnale)" : marketBullish.Value ? "rialzista (solo long)" : "ribassista (solo short)")}");
                 cycle.BtcRegime = marketBullish == null ? "Sconosciuto" : marketBullish.Value ? "Rialzista" : "Ribassista";
