@@ -1,4 +1,4 @@
-using BotCripto.Models;
+﻿using BotCripto.Models;
 
 namespace BotCripto.Strategies;
 
@@ -11,10 +11,13 @@ public class Sma200Strategy
         decimal.TryParse(Environment.GetEnvironmentVariable(name), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var v) ? v : def;
 
     private static readonly int SlopeLookback = (int)Env("SMA_SLOPE", 20);          // la SMA200 deve essere in salita rispetto a N candele fa
-    private static readonly decimal StopBufferBelowSma = Env("SMA_STOP", 0.99m);   // stop sotto il minimo tra SMA200 e minimo della candela
-    private static readonly bool AllowShorts = Env("SMA_SHORTS", 1) != 0;
-    private static readonly decimal VolumeMultiplier = Env("SMA_VOL", 0);           // 0 = filtro volume disattivato
+    private static readonly decimal StopBufferBelowSma = Env("SMA_STOP", 0.75m);   // stop sotto il minimo tra SMA200 e minimo della candela
+    private static readonly bool AllowShorts = Env("SMA_SHORTS", 0) != 0;
+    private static readonly decimal VolumeMultiplier = Env("SMA_VOL", 1.5m);         // 0 = filtro volume disattivato
     private static readonly decimal MinBodyStrength = Env("SMA_BODY", 0.5m);
+    public static readonly int MaxOpenPositions = (int)Env("SMA_MAXPOS", 20);          // 0 = nessun limite
+    private static readonly decimal CrashDrop = Env("SMA_CRASH", 0);                    // 0 = disattivato: blocca i nuovi ingressi se SPY è sceso di oltre X dal massimo recente
+    private static readonly int CrashDays = (int)Env("SMA_CRASHDAYS", 10);
 
     // Regime di mercato: true se l'indice di mercato (SPY) chiude sopra la sua SMA200, false se sotto,
     // null se i dati non sono sufficienti.
@@ -23,6 +26,14 @@ public class Sma200Strategy
         var sma = TechnicalIndicators.CalculateSMA(marketCandles.Select(c => c.Close).ToList(), SmaPeriod);
         if (sma.Count == 0)
             return null;
+
+        // Filtro crollo: se SPY è sceso di oltre CrashDrop dal massimo degli ultimi CrashDays giorni, regime "sconosciuto" (nessun nuovo segnale)
+        if (CrashDrop > 0)
+        {
+            var recentHigh = marketCandles.TakeLast(CrashDays).Max(c => c.Close);
+            if (marketCandles.Last().Close < recentHigh * (1 - CrashDrop))
+                return null;
+        }
         return marketCandles.Last().Close > sma.Last();
     }
 

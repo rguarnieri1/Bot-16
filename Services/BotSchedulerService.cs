@@ -236,6 +236,13 @@ public class BotSchedulerService
                 // Dal segnale più forte al più debole (capitale illimitato: entrano tutti i segnali validi)
                 foreach (var (symbol, emaRibbonResult, candles) in candidates.OrderByDescending(c => c.analysis.Indicators.GetValueOrDefault("SignalStrength")))
                 {
+                    // Limite di posizioni aperte contemporaneamente (come nel backtest)
+                    if (Sma200Strategy.MaxOpenPositions > 0 && openTrades.Count >= Sma200Strategy.MaxOpenPositions)
+                    {
+                        Console.WriteLine($"   ⏭️  {symbol}: segnale scartato (limite {Sma200Strategy.MaxOpenPositions} posizioni aperte)");
+                        continue;
+                    }
+
                     var isLong = emaRibbonResult.Signal.Contains("BUY");
                     // Ingresso alla chiusura della candela del segnale (come nel backtest), non al prezzo live:
                     // lo stop della strategia è calcolato su quella candela e i controlli stop/target partono dalla successiva.
