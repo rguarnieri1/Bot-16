@@ -1,7 +1,7 @@
 namespace BotCripto.Models;
 
 // Segnale valido della strategia (AnalysisResult con IsSignal = true) calcolato sulle candele di crypto.com,
-// con gli indicatori e l'esito del Risk Manager. Salvato nella tabella bot11.bot11_signals.
+// con gli indicatori e l'esito del Risk Manager. Salvato nella tabella bot16.bot16_signals.
 public class SignalRecord
 {
     public long Id { get; set; }

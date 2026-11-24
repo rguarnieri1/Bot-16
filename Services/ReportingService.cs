@@ -165,7 +165,7 @@ public class ReportingService
         }
     }
 
-    // Con il database attivo le operazioni si leggono da SQL Server (bot11.bot11_trades); al primo avvio
+    // Con il database attivo le operazioni si leggono da SQL Server (bot16.bot16_trades); al primo avvio
     // la tabella vuota viene popolata con le operazioni già presenti in Data/trades.json.
     private void LoadTrades()
     {
@@ -241,7 +241,7 @@ public class ReportingService
         }
     }
 
-    // Salva l'operazione chiusa nella tabella bot11.bot11_operazioni_chiuse (solo con il database attivo);
+    // Salva l'operazione chiusa nella tabella bot16.bot16_operazioni_chiuse (solo con il database attivo);
     // una riga per trade: se esiste già non viene duplicata.
     private void SaveClosedTrade(Trade trade)
     {
@@ -264,7 +264,7 @@ public class ReportingService
 
     public List<Trade> GetAllTrades() => _trades;
 
-    // Salva un segnale nella tabella bot11.bot11_signals (solo con il database attivo)
+    // Salva un segnale nella tabella bot16.bot16_signals (solo con il database attivo)
     public void SaveSignal(SignalRecord signal)
     {
         if (!_useDatabase)
@@ -282,7 +282,7 @@ public class ReportingService
         }
     }
 
-    // Salva un ciclo nella tabella bot11.bot11_cycles (solo con il database attivo)
+    // Salva un ciclo nella tabella bot16.bot16_cycles (solo con il database attivo)
     public void SaveCycle(CycleRecord cycle)
     {
         if (!_useDatabase)
